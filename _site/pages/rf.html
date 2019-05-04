@@ -1,0 +1,304 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+  <title>Tree Secies Classification</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <!--[if lte IE 8]><script src="/mof_caldern.github.io/assets/js/ie/html5shiv.js"></script><![endif]-->
+  <link rel="stylesheet" href="/mof_caldern.github.io/assets/css/main.css" />
+  <!--[if lte IE 9]><link rel="stylesheet" href="/mof_caldern.github.io/assets/css/ie9.css" /><![endif]-->
+  <!--[if lte IE 8]><link rel="stylesheet" href="/mof_caldern.github.io/assets/css/ie8.css" /><![endif]-->
+</head>
+
+
+<body>
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+
+        <!-- Main -->
+        <div id="main">
+            <div class="inner">
+
+                <!-- Header -->
+  <header id="header">
+    <a href="https://goergen95.github.io/mof_caldern.github.io" class="logo"><strong>Tree Species Classification</strong> by Darius Görgen</a>
+    <ul class="icons">
+      
+      
+      
+      
+      
+      
+      
+      
+      <li><a href="https://github.com/goergen95/mof_caldern" class="icon fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+      
+      
+      
+    </ul>
+  </header>
+
+
+                <!-- Content -->
+                <section>
+                	<header class="main">
+                		<h1>Tree Species Classification</h1>
+                	</header>
+
+                  
+
+                <h2 id="exploration-of-the-random-forest-classifier">Exploration of the Random Forest Classifier</h2>
+
+<p>For the prediction of tree species a Random Forest Classifier was used.
+Random Forest is a widely used machine learning algorithm based on simple decision tree models.
+At each node of a tree the data is split on the basis of variables in the predictor dataset. While Random Forest can also be used for regression problems, it actually performs better on classifications. In the final node of each individual tree a classification is given. The majority of all trees grown in the forest then decides the final class of a given observation.</p>
+
+<p>The model was trained on a forward-feature selection based on variables obtained from an RGB image of the University Forest in Caldern.
+Following predictors proved best to model tree species:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Predictor</th>
+      <th>Kappa gain</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Red Band</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>Color Index of Vegetation (CIVE)</td>
+      <td>0.178</td>
+    </tr>
+    <tr>
+      <td>First PCA Sobel Filter 15 window</td>
+      <td>0.055</td>
+    </tr>
+    <tr>
+      <td>Second PCA Mean Filter 5 window</td>
+      <td>0.067</td>
+    </tr>
+    <tr>
+      <td>First PCA Gauss Filter 5 window</td>
+      <td>0.011</td>
+    </tr>
+    <tr>
+      <td>Triangulated Greenness Index (TGI)</td>
+      <td>0.013</td>
+    </tr>
+    <tr>
+      <td>Second PCA Sobel Filter 15 window</td>
+      <td>0.011</td>
+    </tr>
+    <tr>
+      <td>First PCA Mean Filter 5 window</td>
+      <td>0.009</td>
+    </tr>
+    <tr>
+      <td>First PCA Sobel Filter 21 window</td>
+      <td>0.009</td>
+    </tr>
+    <tr>
+      <td>Second PCA Laplace of Gaussian Filter 15 window</td>
+      <td>0.008</td>
+    </tr>
+    <tr>
+      <td>First PCA Gauss Filter 15 window</td>
+      <td>0.004</td>
+    </tr>
+    <tr>
+      <td>Blue Band</td>
+      <td>0.002</td>
+    </tr>
+    <tr>
+      <td>Green Leaf Index (GLI)</td>
+      <td>0.003</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The code for calculating different <a href="https://github.com/GeoMOER-Students-Space/mpg-envinfosys-teams-2018-rs_18_axmideda/blob/master/src/000_fun.R#L163">vegetation indices</a> can be found here. In order to reduce the dimensionality of the predictor dataset, we decided to implement a <a href="https://github.com/GeoMOER-Students-Space/mpg-envinfosys-teams-2018-rs_18_axmideda/blob/master/src/003_pcAnalysis.R">principal component analysis</a>. The first two principal components combined together explain above 80% of the variance of all the vegetation indices. This way, we could apply <a href="https://github.com/GeoMOER-Students-Space/mpg-envinfosys-teams-2018-rs_18_axmideda/blob/master/src/000_fun.R#L63">spatial filters</a> solely to the prinicpal components and therefore dramatically reduce the computation time of the forward-feature selection.</p>
+
+<p>The <a href="https://github.com/GeoMOER-Students-Space/mpg-envinfosys-teams-2018-rs_18_axmideda/blob/master/src/010_rf_classification.R">forward feature selection</a> chose 13 variables to model the tree species. Kappa score was chosen as the evaluation metric and the final internal Kappa was <strong>0.37</strong>. According to common interpretation of the Kappa score, this only yields in a <strong>fair</strong> level of agreement.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Score</th>
+      <th>Level of Agreement</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>&lt;0</td>
+      <td>Less than chance</td>
+    </tr>
+    <tr>
+      <td>0 - 0.20</td>
+      <td>Slightly</td>
+    </tr>
+    <tr>
+      <td>0.21 - 0.40</td>
+      <td>Fair</td>
+    </tr>
+    <tr>
+      <td>0.41 - 0.60</td>
+      <td>Moderate</td>
+    </tr>
+    <tr>
+      <td>0.61 - 0.80</td>
+      <td>Substantial</td>
+    </tr>
+    <tr>
+      <td>0.81 - 0.99</td>
+      <td>Almost Perfect</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The final variables chosen for classification and their contribution to the increase in the Kappa score are displayed below.</p>
+
+<p><img src="../assets/images/ffs_vars.png" alt="Fig.1: Kappa scores for added variables" /></p>
+
+<p>This relatively low Kappa score might result from an inadequate sampling strategy. Here, 400 trees, 100 for each species, were polygonised in QGIS and attributed to a class based on visual interpretation of the RGB image as well as an additional shape file indicating forest sections and the dominating species within these sections. The pixels were extracted based on the ID of the individual polygons and a training sample of 8,000 pixels with 20 pixels from each tree were extracted. The remaining dataset was used to calculate an independent Kappa value which achieves with <strong>0.26</strong> also a fair level of agreement.</p>
+
+<p><img src="../assets/images/kappa.png" alt="Fig.2: Internal and External Kappa scores (n= 8,000 and 651,041 respectivley)" /></p>
+
+<p>The low level of agreement results in the confusion of the different species classes. The largest component of the error results from oak pixels being classified as beech pixels. Also a large proportion of pixels from the class Douglas Spruce are wrongly classified as beech. Because the amount of the error is quite high, structurally overestimating the beech class while underestimating the other, the model needs some improvement for an accurate classification of tree species. A different sampling design could prove beneficial while it is unlikely that a higher level of agreement could be achieved with more or different predictors based on RGB images. In contrast, structural predictors generated through the use of LiDAR data could possibly also yield to higher Kappa scores.</p>
+
+<p><img src="../assets/images/cf_alluvial.png" alt="Fig.3: Alluvial Plot of Classification Error)" /></p>
+
+<p>Class Specific Accuracy values are as follows:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Class</th>
+      <th>Sensitivity</th>
+      <th>Specifity</th>
+      <th>Positive Prediction Rate</th>
+      <th>Negative Prediction Rate</th>
+      <th>Balanced Accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Beech</td>
+      <td>0.68</td>
+      <td>0.57</td>
+      <td>0.45</td>
+      <td>0.78</td>
+      <td>0.63</td>
+    </tr>
+    <tr>
+      <td>Dgl. Spruce</td>
+      <td>0.28</td>
+      <td>0.94</td>
+      <td>0.53</td>
+      <td>0.83</td>
+      <td>0.61</td>
+    </tr>
+    <tr>
+      <td>Oak</td>
+      <td>0.45</td>
+      <td>0.77</td>
+      <td>0.44</td>
+      <td>0.78</td>
+      <td>0.61</td>
+    </tr>
+    <tr>
+      <td>Spruce</td>
+      <td>0.35</td>
+      <td>0.97</td>
+      <td>0.72</td>
+      <td>0.88</td>
+      <td>0.66</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+              </div>
+          </div>
+
+          <!-- Sidebar -->
+  <div id="sidebar">
+    <div class="inner">
+
+      <!-- Search -->
+        <section id="search" class="alt">
+          <form method="post" action="#">
+            <input type="text" name="query" id="query" placeholder="Search" />
+          </form>
+        </section>
+    
+      <!-- Menu -->
+        <nav id="menu">
+          <header class="major">
+            <h2>Menu</h2>
+          </header>
+          <ul>
+            <li><a href="https://goergen95.github.io/mof_caldern.github.io/index.html">Home</a></li>
+            <li><a href="https://goergen95.github.io/mof_caldern.github.io/pages/segmentation.html">Tree Segmentation</a></li>
+            <li><a href="https://goergen95.github.io/mof_caldern.github.io/pages/rf.html">Tree Species Classification</a></li>
+            <li><a href="https://goergen95.github.io/mof_caldern.github.io/pages/stat.html">Statistical Results</a></li>
+            <li>
+              <span class="opener">Interactive Maps</span>
+              <ul>
+              	<li><a href="https://goergen95.github.io/mof_caldern.github.io/pages/classification.html">Classification</a></li>
+              	<li><a href="https://goergen95.github.io/mof_caldern.github.io/pages/quality.html">Quality</a></li>
+    			<li><a href="https://goergen95.github.io/mof_caldern.github.io/pages/biodiversity10.html">Biodiversity 10m</a></li>
+                <li><a href="https://goergen95.github.io/mof_caldern.github.io/pages/biodiversity30.html">Biodiversity 30m</a></li>
+                <li><a href="https://goergen95.github.io/mof_caldern.github.io/pages/biodiversity.html">Biodiversity 1 acre</a></li>
+                <li><a href="https://goergen95.github.io/mof_caldern.github.io/pages/drcN.html">Direct Neighbours</a></li>
+                <li><a href="https://goergen95.github.io/mof_caldern.github.io/pages/density.html">Vertical Density</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+
+
+​      
+​      <!-- Section -->
+​        <section>
+​          <header class="major">
+​            <h2>Get in touch</h2>
+​          </header>
+​          <p>For further information, don't hesitate to contact us.</p>
+​          <ul class="contact">
+​           <li class="fa-envelope-o"><a href="#">darius2402@web.de</a></li>
+​          </ul>
+​        </section>
+​    
+​      <!-- Footer -->
+​        <footer id="footer">
+​          <p class="copyright">&copy; Tree Species Classification. All rights reserved. <a href="#">Imprint</a>. Design: <a href="https://html5up.net">HTML5 UP</a>. Jekyll integration: <a href="https://andrewbanchi.ch">Andrew Banchich</a>.</p>
+​        </footer>
+​    
+​    </div>
+  </div>
+
+
+      </div>
+
+      <!-- Scripts -->
+  <script src="https://goergen95.github.io/mof_caldern.github.io/assets/js/jquery.min.js"></script>
+  <script src="https://goergen95.github.io/mof_caldern.github.io/assets/js/skel.min.js"></script>
+  <script src="https://goergen95.github.io/mof_caldern.github.io/assets/js/util.js"></script>
+  <!--[if lte IE 8]><script src="https://goergen95.github.io/mof_caldern.github.io/assets/js/ie/respond.min.js"></script><![endif]-->
+  <script src="https://goergen95.github.io/mof_caldern.github.io/assets/js/main.js"></script>
+
+
+</body>
+
+</html>

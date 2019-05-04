@@ -1,0 +1,56 @@
+<!-- Sidebar -->
+  <div id="sidebar">
+    <div class="inner">
+
+      <!-- Search -->
+        <section id="search" class="alt">
+          <form method="post" action="#">
+            <input type="text" name="query" id="query" placeholder="Search" />
+          </form>
+        </section>
+    
+      <!-- Menu -->
+        <nav id="menu">
+          <header class="major">
+            <h2>Menu</h2>
+          </header>
+          <ul>
+            <li><a href="{{ 'index.html' | absolute_url }}">Home</a></li>
+            <li><a href="{{ 'pages/segmentation.html' | absolute_url }}">Tree Segmentation</a></li>
+            <li><a href="{{ 'pages/rf.html' | absolute_url }}">Tree Species Classification</a></li>
+            <li><a href="{{ 'pages/stat.html' | absolute_url }}">Statistical Results</a></li>
+            <li>
+              <span class="opener">Interactive Maps</span>
+              <ul>
+              	<li><a href="{{ 'pages/classification.html' | absolute_url }}">Classification</a></li>
+              	<li><a href="{{ 'pages/quality.html' | absolute_url }}">Quality</a></li>
+    			<li><a href="{{ 'pages/biodiversity10.html' | absolute_url }}">Biodiversity 10m</a></li>
+                <li><a href="{{ 'pages/biodiversity30.html' | absolute_url }}">Biodiversity 30m</a></li>
+                <li><a href="{{ 'pages/biodiversity.html' | absolute_url }}">Biodiversity 1 acre</a></li>
+                <li><a href="{{ 'pages/drcN.html' | absolute_url }}">Direct Neighbours</a></li>
+                <li><a href="{{ 'pages/density.html' | absolute_url }}">Vertical Density</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+
+
+​      
+​      <!-- Section -->
+​        <section>
+​          <header class="major">
+​            <h2>Get in touch</h2>
+​          </header>
+​          <p>For further information, don't hesitate to contact us.</p>
+​          <ul class="contact">
+​           <li class="fa-envelope-o"><a href="#">{{ site.email }}</a></li>
+​          </ul>
+​        </section>
+​    
+​      <!-- Footer -->
+​        <footer id="footer">
+​          <p class="copyright">&copy; {{ site.title }}. All rights reserved. <a href="#">Imprint</a>. Design: <a href="https://html5up.net">HTML5 UP</a>. Jekyll integration: <a href="https://andrewbanchi.ch">Andrew Banchich</a>.</p>
+​        </footer>
+​    
+​    </div>
+  </div>

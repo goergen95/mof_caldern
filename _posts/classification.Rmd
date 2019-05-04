@@ -1,0 +1,68 @@
+---
+title: "Classification Map of the University Forest Caldern"
+output: 
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rgdal)
+library(link2GI)
+library(mapview)
+library(raster)
+
+species = readOGR("../page/mof_realdata.shp")
+
+nam = readRDS("../page/labels_crowns.rds")
+names(species) = nam
+
+```
+[Return](https://goergen95.github.io/mof_caldern.github.io/)
+
+## Species Classification of the University Forest Caldern
+This is the interactive map of the species classification result. The classification is based on a [Random Forest model](https://github.com/GeoMOER-Students-Space/mpg-envinfosys-teams-2018-rs_18_axmideda/blob/master/src/010_rf_classification.R) trained in a 5-fold cross-validation.
+By clicking on ploygons you will get addtional information including:
+```{r table, echo = FALSE}
+df = data.frame(variable = names(species))
+expl = c("Tree Identification Number",
+         "Maximum Height",
+         "Crown Area (in meter)",
+         "Average vertical Density",
+         "Number of pixels classified as Beech",
+         "Number of pixels classified as Douglas Spruce",
+         "Number of pixels classified as Oak",
+         "Number of pixels classified as Spruce",
+         "Total number of Pixels",
+         "Percentage of maximum class",
+         "Classification Result",
+         "Number of trees in 1 acre environment",
+         "Percantage of crown cover in 1 acre environment",
+         "Average free space per stem in 1 acre environment",
+         "Number of direct neighbors",
+         "Entropy value based on number of tress ",
+         "Entropy value based on species in 10 meter environment",
+         "Entropy value based on species in 30 meter environment",
+         "Entropy value based on species in one acre environment"
+         )
+df$explanation = expl
+df
+
+
+```
+
+
+```{r map, echo = FALSE, warning=FALSE}
+palSpecs = c("#66c2a5","#fc8d62", "#8da0cb","#e78ac3")
+
+ mapview::mapview(species, zcol = c("species"),
+                       color = "black",
+                       #at = seq(40,100,2.5),
+                       col.regions = palSpecs,
+                       na.color = "grey",
+                       lwd = 0.1,
+                       legend = TRUE,
+                  layer.name = "Result of Classification")
+
+```
+[Return](https://goergen95.github.io/mof_caldern.github.io/)

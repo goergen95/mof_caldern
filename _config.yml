@@ -1,0 +1,25 @@
+# Site settings
+title: Tree Species Classification
+subtitle: by Darius Görgen
+email: darius2402@web.de
+description: Methods & Results Documentation
+baseurl: /mof_caldern.github.io
+url: https://goergen95.github.io # the base hostname & protocol for your site
+author: goergen95
+
+# Social settings
+500px_url:
+facebook_url:
+github_url: https://github.com/goergen95/mof_caldern
+gitlab_url: 
+googleplus_url: 
+instagram_url: 
+linkedin_url: 
+pinterest_url:
+slack_url:
+twitter_url:
+
+# Build settings
+markdown: kramdown
+
+exclude: ['*.Rmd']
