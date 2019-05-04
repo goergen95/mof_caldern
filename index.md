@@ -76,7 +76,7 @@ Last, but not least, you are invited to leave your comments and ideas you may ha
 	</ul>
 </article>
         <article>
-	<a href="{{ 'pages/biodiversity10.html' | absolute_url }}" class="image"><img src="assets/images/biodiv.png" alt="" width="256" height="256" /></a>
+	<a href="{{ 'pages/biodiversity10.html' | absolute_url }}" class="image"><img src="assets/images/biodiv.PNG" alt="" width="256" height="256" /></a>
 	<h3>Biodiversity at 10 meter</h3>
 	<p>Here you can interact with the results of biodiversity assessment in a 10 meter envrionment for each tree,</p>
 	<ul class="actions">
