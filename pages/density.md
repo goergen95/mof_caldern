@@ -13,7 +13,7 @@ is hosted by servers of the Environmental Informatics Department of the
 University of Marburg. Be aware that the file size is above 100 MB.
 
 This
-[index](https://github.com/GeoMOER-Students-Space/mpg-envinfosys-teams-2018-rs_18_axmideda/blob/master/src/011_structure_values.R#L97)
+[index](https://github.com/goergen95/mof_caldern/blob/master/src/011_structure_values.R#L97)
 was calculated by averaging the proportion of above ground LIDAR returns
 from all returns for each individual tree. The code to calculate this
 index can be accessed here.

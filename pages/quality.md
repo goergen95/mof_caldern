@@ -15,7 +15,7 @@ University of Marburg. Be aware that the file size is above 100 MB.
 
 Each segment is classified to a specific species by counting the pixels
 within the segment. The majority class is used to label the segment.
-[Quality](https://github.com/GeoMOER-Students-Space/mpg-envinfosys-teams-2018-rs_18_axmideda/blob/master/src/011_structure_values.R#L62)
+[Quality](https://github.com/goergen95/mof_caldern/blob/master/src/011_structure_values.R#L62)
 thus is measured here by the percentage of the majority pixels within a
 tree segment. Trees where two or more classes have the same number of
 pixels within a segment were excluded because no clear species label

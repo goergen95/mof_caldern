@@ -15,7 +15,7 @@ University of Marburg. Be aware that the file size is above 100 MB.
 This index was calculated by a ten centimeter buffer and counting the
 intersecting polygons in the neihborhood of each segment. The code to
 calculate the [direct
-neigbours](https://github.com/GeoMOER-Students-Space/mpg-envinfosys-teams-2018-rs_18_axmideda/blob/master/src/011_structure_values.R#L140)
+neigbours](https://github.com/goergen95/mof_caldern/blob/master/src/011_structure_values.R#L140)
 can be seen here. It thus indicates some measure of competition. By
 clicking on ploygons you will get addtional information including:
 
