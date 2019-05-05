@@ -2595,6 +2595,10 @@
 			.image.main img {
 				width: 100%;
 			}
+		.responsive {
+			max-width: 150%;
+			height: auto;
+			}
 
 	a.image {
 		overflow: hidden;
