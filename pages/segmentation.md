@@ -7,6 +7,8 @@ title: Tree Segmentation
 
 The tree segmentation was based on LIDAR data. LIDAR data is obtained by laser rays sent to the earth's surface by air vehicles. By measuring the time difference between sending a beam and receiving its reflection, information about the distance and the height of objects on the earth's surface can be obtained. In forests, we can observe significant differences in the height of returns from crowns and the ground. These differences can be used to apply an image segmentation to define single trees. In the raw format, LiDAR data consists of a point-cloud which looks like this:
 
+![test 2](../assets/images/las_file.png){:class="img-responsive"}
+
 <img src="../assets/images/las_file.png" alt="test image size" class="img-responsive">
 
 <img src="../assets/images/las_file.PNG" alt="Kitten"
