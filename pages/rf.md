@@ -43,17 +43,17 @@ The [forward feature selection](https://github.com/goergen95/mof_caldern/blob/ma
 
 The final variables chosen for classification and their contribution to the increase in the Kappa score are displayed below.
 
-<img src="../assets/images/ffs_vars.png" alt="Kappa scores for added variables"
+<img src="../assets/images/ffs_vars.png" class="image" alt="Kappa scores for added variables"
 	title="Kappa scores for added variables" width=" 80% "/>
 
 This relatively low Kappa score might result from an inadequate sampling strategy. Here, 400 trees, 100 for each species, were polygonised in QGIS and attributed to a class based on visual interpretation of the RGB image as well as an additional shape file indicating forest sections and the dominating species within these sections. The pixels were extracted based on the ID of the individual polygons and a training sample of 8,000 pixels with 20 pixels from each tree were extracted. The remaining dataset was used to calculate an independent Kappa value which achieves with **0.26** also a fair level of agreement.
 
-<img src="../assets/images/kappa.png" alt="Internal and External Kappa scores (n= 8,000 and 651,041 respectivley)"
+<img src="../assets/images/kappa.png" class="image" alt="Internal and External Kappa scores (n= 8,000 and 651,041 respectivley)"
 	title="Internal and External Kappa scores (n= 8,000 and 651,041 respectivley)" width=" 80% "/>
 
 The low level of agreement results in the confusion of the different species classes. The largest component of the error results from oak pixels being classified as beech pixels. Also a large proportion of pixels from the class Douglas Spruce are wrongly classified as beech. Because the amount of the error is quite high, structurally overestimating the beech class while underestimating the other, the model needs some improvement for an accurate classification of tree species. A different sampling design could prove beneficial while it is unlikely that a higher level of agreement could be achieved with more or different predictors based on RGB images. In contrast, structural predictors generated through the use of LiDAR data could possibly also yield to higher Kappa scores.
 
-<img src="../assets/images/cf_alluvial.png" alt="Alluvial Plot of Classification Error)"
+<img src="../assets/images/cf_alluvial.png" class="image" alt="Alluvial Plot of Classification Error)"
 	title="Alluvial Plot of Classification Error)" width=" 80% "/>
 
 Class Specific Accuracy values are as follows:
