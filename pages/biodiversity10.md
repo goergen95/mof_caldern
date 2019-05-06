@@ -21,7 +21,7 @@ the neighbourhood. At this scale, it gives a good overview of
 biodiversity hotspots in the forest area.
 
 <img src="biodiversity10_files/figure-markdown_strict/unnamed-chunk-1-1.png" class="image" alt="Map Preview"
-	title="Map Preview"/>
+	title="Map Preview" width = "90%"/>
 
 
 
