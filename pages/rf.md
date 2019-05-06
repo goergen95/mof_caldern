@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Tree Species Classification
+title: Random Forest Classification
 ---
 
 ## Exploration of the Random Forest Classifier
