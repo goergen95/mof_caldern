@@ -19,4 +19,7 @@ neigbours](https://github.com/goergen95/mof_caldern/blob/master/src/011_structur
 can be seen here. It thus indicates some measure of competition. By
 clicking on ploygons you will get addtional information including:
 
-![Map Preview<](drcN_files/figure-markdown_strict/unnamed-chunk-1-1.png)
+<img src="drcN_files/figure-markdown_strict/unnamed-chunk-1-1.png" class="image" alt="Map Preview"
+	title="Map Preview"/>
+
+

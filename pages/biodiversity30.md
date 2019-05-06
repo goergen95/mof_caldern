@@ -22,4 +22,7 @@ the Shannon-Weaver Entropy index for the different species present in
 the neighbourhood. At this scale, it gives a good overview of
 biodiversity hotspots in the forest area.
 
-![Map Preview <](biodiversity30_files/figure-markdown_strict/unnamed-chunk-1-1.png)
+<img src="biodiversity30_files/figure-markdown_strict/unnamed-chunk-1-1.png" class="image" alt="Map Preview"
+	title="Map Preview"/>
+
+

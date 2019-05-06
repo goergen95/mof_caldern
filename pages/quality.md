@@ -21,4 +21,7 @@ tree segment. Trees where two or more classes have the same number of
 pixels within a segment were excluded because no clear species label
 could be attributed to these segments.
 
-![Map Preview<](quality_files/figure-markdown_strict/unnamed-chunk-1-1.png)
+<img src="quality_files/figure-markdown_strict/unnamed-chunk-1-1.png" class="image" alt="Map Preview"
+	title="Map Preview"/>
+
+

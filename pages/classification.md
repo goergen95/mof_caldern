@@ -18,5 +18,8 @@ Classifier](https://github.com/goergen95/mof_caldern/blob/master/src/010_rf_clas
 trained in a 5-fold cross-validation and a [forward feature
 selection](rf.html).
 
-![Map Preview<](classification_files/figure-markdown_strict/map-1.png)
+<img src="classification_files/figure-markdown_strict/map-1.png" class="image" alt="Map Preview"
+	title="Map Preview"/>
+
+
 
