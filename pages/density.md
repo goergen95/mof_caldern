@@ -18,6 +18,10 @@ was calculated by averaging the proportion of above ground LIDAR returns
 from all returns for each individual tree. The code to calculate this
 index can be accessed here.
 
-<img src="density_files/figure-markdown_strict/unnamed-chunk-1-1.png" class="image" alt="Map Preview" title="Map Preview" width = "90%"/>
+<article>
+ <a href="{{ 'http://seminar.environmentalinformatics-marburg.de/Seminar_RS/density.html' | absolute_url }}" class="image"><image  src="density_files/figure-markdown_strict/unnamed-chunk-1-1.png" alt="" width=" 80% " /></a>
+</article>
+
+
 
 

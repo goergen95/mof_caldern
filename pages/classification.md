@@ -18,7 +18,11 @@ Classifier](https://github.com/goergen95/mof_caldern/blob/master/src/010_rf_clas
 trained in a 5-fold cross-validation and a [forward feature
 selection](rf.html).
 
-<img src="classification_files/figure-markdown_strict/map-1.png" class="image" alt="Map Preview" title="Map Preview" width = "90%"/>
+
+
+<article>
+ <a href="{{ 'http://seminar.environmentalinformatics-marburg.de/Seminar_RS/classification.html' | absolute_url }}" class="image"><image  src="classification_files/figure-markdown_strict/map-1.png" alt="" width=" 80% " /></a>
+</article>
 
 
 
