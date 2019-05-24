@@ -100,7 +100,7 @@ m6 = mapview::mapview(species, zcol = c("div10"),
                       legend = TRUE,
                       layer.name = "Biodiversity Index (10 meters)")
 
-mapshot(m6, url = "..assets/maps/mapobjects/biodiv10.html")
+mapshot(m6, url = "biodiv10.html")
 
 
 ###################### Biodiversity 1 acre Map Object ###################################

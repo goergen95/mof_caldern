@@ -19,4 +19,8 @@ trained in a 5-fold cross-validation and a [forward feature
 selection](rf.html).
 
 
-<iframe src="../assets/maps/mapobjects/quality.html" style="width:100%;height:800%;" ></iframe>
+<div class="map_container">
+    <iframe class="map_iframe" src="../assets/maps/mapobjects/quality.html" seamless
+    ></iframe>
+</div>
+
