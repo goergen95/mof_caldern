@@ -19,7 +19,7 @@ trained in a 5-fold cross-validation and a [forward feature
 selection](rf.html).
 
 <div id="mapid" style="width: 600px; height: 400px;"></div>
-<script src="../assets/maps/mapobjects/classification.html"</script>
+<script src="../assets/maps/mapobjects/classification.js"</script>
 
 <article>
  <a href="{{ 'http://seminar.environmentalinformatics-marburg.de/Seminar_RS/classification.html' | absolute_url }}" class="image"><image  src="classification_files/figure-markdown_strict/map-1.png" alt="" width=" 80% " /></a>

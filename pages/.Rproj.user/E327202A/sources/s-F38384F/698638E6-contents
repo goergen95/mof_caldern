@@ -72,7 +72,7 @@ m4 = mapview::mapview(species, zcol = c("dens"),
                  legend = TRUE,
                  layer.name = "Vertical Vegetation Density")
 
-mapshot(m4, url = "..assets/maps/mapobjects/density.html")
+mapshot(m4, url = "density.html")
 
 ###################### Biodiversity 30m Map Object ###################################
 greenred = colorRampPalette(c("green","yellow","red"))
