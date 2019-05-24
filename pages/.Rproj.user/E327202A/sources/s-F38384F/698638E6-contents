@@ -86,7 +86,7 @@ m5 = mapview::mapview(species, zcol = c("div30"),
                  legend = TRUE,
                  layer.name = "Biodiversity Index (30 meters)")
 
-mapshot(m5, url = "..assets/maps/mapobjects/biodiv30.html")
+mapshot(m5, url = "biodiv30.html")
 
 ###################### Biodiversity 10m Map Object ###################################
 greenred = colorRampPalette(c("green","yellow","red"))
