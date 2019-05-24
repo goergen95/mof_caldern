@@ -1,9 +1,7 @@
 ---
 layout: page
 title: Statistical Results
-output: 
-  html_document:
-    df_print: paged
+output: md_document
 ---
 
 ```{r setup, include=FALSE}
