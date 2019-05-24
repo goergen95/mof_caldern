@@ -17,8 +17,8 @@ the neighbourhood. At this scale, it gives a good overview of
 biodiversity hotspots in the forest area.
 
 
-<div class="map_container">
-    <iframe class="map_iframe" src="../assets/maps/mapobjects/biodiv10.html" width="600" height="450" frameborder="0"
+<div class="map-container">
+    <iframe class="map-iframe" src="../assets/maps/mapobjects/biodiv10.html" width="600" height="450" frameborder="0"
     ></iframe>
 </div>
 

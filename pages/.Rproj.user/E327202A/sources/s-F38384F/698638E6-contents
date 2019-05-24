@@ -18,6 +18,11 @@ names(species) = nam
 
 ###################### Classification Map Object ###################################
 palSpecs = c("#66c2a5","#fc8d62", "#8da0cb","#e78ac3")
+species$species = as.character(species$species)
+species$species[which(species$species=="1")] = "Beech"
+species$species[which(species$species=="2")] = "Dgl. Spruce"
+species$species[which(species$species=="3")] = "Oak"
+species$species[which(species$species=="4")] = "Spruce"
 
 m1 = mapview::mapview(species, zcol = c("species"),
                  color = "black",
@@ -27,7 +32,7 @@ m1 = mapview::mapview(species, zcol = c("species"),
                  legend = TRUE,
                  layer.name = "Result of Classification")
 
-mapshot(m1, url = "classification.html")
+mapshot(m1, url = "classificationMap.html")
 
 
 ###################### Quality Map Object ###################################
@@ -116,3 +121,35 @@ m7 =  mapview::mapview(species, zcol = c("divA"),
                        layer.name = "Biodiversity Index (1 acre)")
 
 mapshot(m7, url = "biodiv1acre.html")
+
+
+
+
+
+###################### Stats Map Object ###################################
+shapeAbt = readOGR("../assets/maps/shapeAbt.shp")
+namA = readRDS("../assets/maps/namesAbt.rds")
+names(shapeAbt) = namA
+
+
+sections = readOGR("../assets/maps/uwcWaldorte_AOI.shp")
+names(sections) = c("sectionID","SpeciesSection")
+
+
+
+colAbt = RColorBrewer::brewer.pal(name = "Set3", 9)
+colSpec = c("#66c2a5","#fc8d62", "#8da0cb","#e78ac3")
+org = par()
+
+
+
+m8 = mapview::mapview(sections,zcol = "SpeciesSection", 
+                     color = "black", 
+                     col.regions =  c("#66c2a5","#fc8d62", "#8da0cb","#e78ac3"), 
+                     alpha.regions = 0.4,
+                     layer.name = "Dominant Species") 
+lopt = leaflet::labelOptions(noHide = TRUE,
+                             direction = 'top',
+                             textOnly = TRUE)
+m8 = mapview::addStaticLabels(m8,label = as.character(sections$sectionID), labelOptions = lopt)
+mapshot(m8, url = "statmap.html")

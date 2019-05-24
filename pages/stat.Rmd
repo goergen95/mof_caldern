@@ -29,18 +29,6 @@ org = par()
 
 In this section we present the distribution of some of the indicators we retrieved from combining our species classification with the tree segmentation. The results are presented according to species and forest sections. On the map below, the sections of interest are coloured by the dominant species. Note, that for the ease of displaying the results some of the sections were combined together based on spatial distances.
 
-```{r sections, echo = FALSE}
-m = mapview::mapview(sections,zcol = "SpeciesSection", 
-                     color = "black", 
-                     col.regions =  c("#66c2a5","#fc8d62", "#8da0cb","#e78ac3"), 
-                     alpha.regions = 0.4,
-                     layer.name = "Dominant Species") 
-lopt = leaflet::labelOptions(noHide = TRUE,
-                    direction = 'top',
-                    textOnly = TRUE)
-l = mapview::addStaticLabels(m,label = as.character(sections$sectionID), labelOptions = lopt)
-l
-```
 
 
 The first two parameters are quite straight forward. These are the tree height, indicated by the highest pixel value within each segment and the total crown area. We present the results as boxplots for each of the species and for all sections of the forest. Note, that only trees which within the sections are included. In total, they consitute **21,209** trees.

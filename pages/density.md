@@ -15,8 +15,8 @@ from all returns for each individual tree. The code to calculate this
 index can be accessed here.
 
 
-<div class="map_container">
-    <iframe class="map_iframe" src="../assets/maps/mapobjects/density.html" width="600" height="450" frameborder="0"
+<div class="map-container">
+    <iframe class="map-iframe" src="../assets/maps/mapobjects/density.html" width="600" height="450" frameborder="0"
     ></iframe>
 </div>
 

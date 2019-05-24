@@ -15,8 +15,8 @@ trained in a 5-fold cross-validation and a [forward feature
 selection](rf.html).
 
 
-<div class="map_container">
-    <iframe class="map_iframe" src="../assets/maps/mapobjects/classification.html" width="600" height="450" frameborder="0"
+<div class="map-container">
+    <iframe class="map-iframe" src="../assets/maps/mapobjects/classification.html" width="600" height="450" frameborder="0"
     ></iframe>
 </div>
 

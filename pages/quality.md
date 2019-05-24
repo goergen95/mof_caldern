@@ -17,7 +17,7 @@ tree segment. Trees where two or more classes have the same number of
 pixels within a segment were excluded because no clear species label
 could be attributed to these segments.
 
-<div class="map_container">
-    <iframe class="map_iframe" src="../assets/maps/mapobjects/quality.html" width="600" height="450" frameborder="0"
+<div class="map-container">
+    <iframe class="map-iframe" src="../assets/maps/mapobjects/quality.html" width="600" height="450" frameborder="0"
     ></iframe>
 </div>
