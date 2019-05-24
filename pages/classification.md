@@ -20,7 +20,7 @@ selection](rf.html).
 
 
 <div class="map_container">
-    <iframe class="map_iframe" src="../assets/maps/mapobjects/quality.html" seamless
+    <iframe class="map_iframe" src="../assets/maps/mapobjects/quality.html" width="600" height="450" frameborder="0"
     ></iframe>
 </div>
 
