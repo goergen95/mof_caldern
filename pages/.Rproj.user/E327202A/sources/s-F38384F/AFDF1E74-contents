@@ -1,0 +1,36 @@
+---
+layout: page
+title: "Number of direct neighbours"
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rgdal)
+library(link2GI)
+library(mapview)
+library(raster)
+species = readOGR("../assets/maps/mof_realdata.shp")
+nam = readRDS("../assets/maps/labels_crowns.rds")
+names(species) = nam
+```
+## Number of direct neighbours for each individual tree
+This is a preview of the map for tree species biodiversity in a 30 meter environment for the University Forest Caldern.
+Unfortunatley, due to file size limitations on github, the fully interactive version of the [map](http://seminar.environmentalinformatics-marburg.de/Seminar_RS/biodiversity30.html) is hosted by servers of the Environmental Informatics Department of the University of Marburg. Be aware that the file size is above 100 MB.
+
+This index was calculated by a ten centimeter buffer and counting the intersecting polygons in the neihborhood of each segment. The code to calculate the [direct neigbours](https://github.com/GeoMOER-Students-Space/mpg-envinfosys-teams-2018-rs_18_axmideda/blob/master/src/011_structure_values.R#L140) can be seen here. It thus indicates some measure of competition. By clicking on ploygons you will get addtional information including:
+
+```{r echo = FALSE, warning=FALSE}
+intens = colorRampPalette(c("khaki1","hotpink4","gray0"))
+mapview::mapview(species, zcol = c("NDirNeigh"),
+                 color = "grey",
+                 at = seq(1,14,1),
+                 col.regions = intens(14),
+                 na.color = "forestgreen",
+                 lwd = 0.1,
+                 legend = TRUE,
+                 layer.name = "Direct Neighbours")
+
+```
+
+
