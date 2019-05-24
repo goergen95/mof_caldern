@@ -9,7 +9,7 @@ library(rmapshaper)
 library(spdplyr)
 library(magrittr)
 library(leaflet)
-species = readOGR("../assets/maps/mof_realdata.shp")
+species2 = readOGR("../assets/maps/mof_realdata.shp")
 nam = readRDS("../assets/maps/labels_crowns.rds")
 names(species) = nam
 
@@ -23,7 +23,10 @@ geojson_write(species_gj_simple,file="B:/mof_caldern/assets/maps/mof_simple.geoj
 
 species = geojson_read("../assets/maps/mof_simple.geojson", what = "sp")
 species = readOGR("../assets/maps/mof_simple.geojson",layer = "mof_simple")
+nam = readRDS("../assets/maps/labels_crowns.rds")
 names(species) = nam
+proj4string(species) = "+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs"
+
 
 
 redgreen = grDevices::colorRampPalette(c("red","green"))
@@ -36,7 +39,7 @@ m = mapview::mapview(species, zcol = c("quality"),
                  legend = TRUE,
                  layer.name = "Quality of Classification")
 
-mapshot(m,url="quality_test.html" )
+mapshot(m,url="quality_test.html")
 
 m = leaflet(species_gj_simple) %>%
   addTiles() 

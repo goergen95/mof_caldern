@@ -1,0 +1,118 @@
+# create map html objects to be included in page markdowns
+
+library(rgdal)
+library(link2GI)
+library(mapview)
+library(raster)
+library(RColorBrewer)
+library(geojsonio)
+library(spdplyr)
+
+# basic data
+species = readOGR("../assets/maps/mof_simple.geojson",layer = "mof_simple")
+species = species[,-20]
+proj4string(species) = "+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs"
+nam = readRDS("../assets/maps/labels_crowns.rds")
+names(species) = nam
+
+
+###################### Classification Map Object ###################################
+palSpecs = c("#66c2a5","#fc8d62", "#8da0cb","#e78ac3")
+
+m1 = mapview::mapview(species, zcol = c("species"),
+                 color = "black",
+                 col.regions = palSpecs,
+                 na.color = "grey",
+                 lwd = 0.1,
+                 legend = TRUE,
+                 layer.name = "Result of Classification")
+
+mapshot(m1, url = "classification.html")
+
+
+###################### Quality Map Object ###################################
+
+redgreen = grDevices::colorRampPalette(c("red","green"))
+
+m2 = mapview::mapview(species, zcol = c("quality"),
+                 color = "black",
+                 at = seq(25,100,5),
+                 col.regions = redgreen(16),
+                 na.color = "grey",
+                 lwd = 0.1,
+                 legend = TRUE,
+                 layer.name = "Quality of Classification")
+mapshot(m2, url = "quality.html")
+
+
+###################### Neigbours Map Object ###################################
+
+intens = colorRampPalette(c("khaki1","hotpink4","gray0"))
+
+m3 = mapview::mapview(species, zcol = c("NDirNeigh"),
+                      color = "grey",
+                      at = seq(1,14,1),
+                      col.regions = intens(14),
+                      na.color = "forestgreen",
+                      lwd = 0.1,
+                      legend = TRUE,
+                      layer.name = "Direct Neighbours")
+
+mapshot(m3, url = "drcN.html")
+
+###################### Density Map Object ###################################
+intens = colorRampPalette(c("lemonchiffon","darkolivegreen3","forestgreen"))
+
+m4 = mapview::mapview(species, zcol = c("dens"),
+                 color = "grey",
+                 at = seq(0,1,0.02),
+                 col.regions = intens(51),
+                 na.color = "grey",
+                 lwd = 0.1,
+                 legend = TRUE,
+                 layer.name = "Vertical Vegetation Density")
+
+mapshot(m4, url = "..assets/maps/mapobjects/density.html")
+
+###################### Biodiversity 30m Map Object ###################################
+greenred = colorRampPalette(c("green","yellow","red"))
+
+m5 = mapview::mapview(species, zcol = c("div30"),
+                 color = "black",
+                 at = seq(0,1.4,0.1),
+                 col.regions = greenred(15),
+                 na.color = "grey",
+                 lwd = 0.1,
+                 legend = TRUE,
+                 layer.name = "Biodiversity Index (30 meters)")
+
+mapshot(m5, url = "..assets/maps/mapobjects/biodiv30.html")
+
+###################### Biodiversity 10m Map Object ###################################
+greenred = colorRampPalette(c("green","yellow","red"))
+
+m6 = mapview::mapview(species, zcol = c("div10"),
+                      color = "black",
+                      at = seq(0,1.4,0.1),
+                      col.regions = greenred(15),
+                      na.color = "grey",
+                      lwd = 0.1,
+                      legend = TRUE,
+                      layer.name = "Biodiversity Index (10 meters)")
+
+mapshot(m6, url = "..assets/maps/mapobjects/biodiv10.html")
+
+
+###################### Biodiversity 1 acre Map Object ###################################
+greenred = colorRampPalette(c("green","yellow","red"))
+
+m7 =  mapview::mapview(species, zcol = c("divA"),
+                       color = "black",
+                       at = seq(0,1.4,0.1),
+                       col.regions = greenred(15),
+                       na.color = "grey",
+                       lwd = 0.1,
+                       legend = TRUE,
+                       layer.name = "Biodiversity Index (1 acre)")
+
+mapshot(m7, url = "..assets/maps/mapobjects/biodiv1acre.html")

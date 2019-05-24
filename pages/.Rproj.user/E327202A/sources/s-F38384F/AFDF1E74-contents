@@ -10,7 +10,8 @@ library(rgdal)
 library(link2GI)
 library(mapview)
 library(raster)
-species = readOGR("../assets/maps/mof_realdata.shp")
+species = readOGR("../assets/maps/mof_simple.geojson",layer = "mof_simple")
+proj4string(species) = "+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs"
 nam = readRDS("../assets/maps/labels_crowns.rds")
 names(species) = nam
 ```
