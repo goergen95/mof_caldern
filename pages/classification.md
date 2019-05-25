@@ -7,7 +7,7 @@ title: Tree Species Classification
 Tree Species Classification for the University Forest Caldern
 -------------------------------------------------------------
 
-This is the map for the classification of tree species for the University Forest Caldern. Be aware that the file size is above **100 MB**.
+This is the map for the classification of tree species for the University Forest Caldern. Be aware that the file size is approximatley **100 MB**.
 
 The classification is based on a [Random Forest
 Classifier](https://github.com/goergen95/mof_caldern/blob/master/src/010_rf_classification.R)
