@@ -1,6 +1,6 @@
 ---
 layout: page_map
-title: Vertical Density
+title: Statistics
 ---
 
 Statistical Results
