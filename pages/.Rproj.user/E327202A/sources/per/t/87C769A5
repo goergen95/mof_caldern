@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1559115201914.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3183907049",
+    "id" : "87C769A5",
+    "lastKnownWriteTime" : 1557480435,
+    "last_content_update" : 1557480435,
+    "path" : "B:/polymer/polymeRID/first_steps.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

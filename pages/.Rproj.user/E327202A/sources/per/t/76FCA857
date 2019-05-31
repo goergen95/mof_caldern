@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1559115199068.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1539688723",
+    "id" : "76FCA857",
+    "lastKnownWriteTime" : 1558610413,
+    "last_content_update" : 1558610413,
+    "path" : "B:/polymer/polymeRID/createTestDataset.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

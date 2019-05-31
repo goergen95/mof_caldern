@@ -1,0 +1,141 @@
+createTestDataset = function(data,category = "Abbreviation",noise = c(),savG = list(p=3,w=11)){
+  if(!category %in% names(data)) print("The categorial variable you provided does not match any column in the dataframe")
+  # center and scale data
+  data.norm = as.data.frame(base::scale(data[,-which(names(data)==category)]))
+  data.norm[category] = data[category]
+  # savitzkiy golay filter on raw data
+  data.sg = as.data.frame(prospectr::savitzkyGolay(data[,-which(names(data)==category)], p = savG[[1]], w = savG[[2]], m = 0))
+  data.sg[category] = data[category]
+  data.sg.d1 = as.data.frame(prospectr::savitzkyGolay(data[,-which(names(data)==category)], p = savG[[1]], w = savG[[2]], m = 1))
+  data.sg.d1[category] = data[category]
+  data.sg.d2 = as.data.frame(prospectr::savitzkyGolay(data[,-which(names(data)==category)], p = savG[[1]], w = savG[[2]], m = 2))
+  data.sg.d2[category] = data[category]
+  # savitzkiy golay filter on normalized data
+  data.sg.norm = as.data.frame(prospectr::savitzkyGolay(data.norm[,-which(names(data.norm)==category)], p = savG[[1]], w = savG[[2]], m = 0))
+  data.sg.norm[category] = data.norm[category]
+  data.sg.d1.norm = as.data.frame(prospectr::savitzkyGolay(data.norm[,-which(names(data.norm)==category)], p = savG[[1]], w = savG[[2]], m = 1))
+  data.sg.d1.norm[category] = data.norm[category]
+  data.sg.d2.norm = as.data.frame(prospectr::savitzkyGolay(data.norm[,-which(names(data.norm)==category)], p = savG[[1]], w = savG[[2]], m = 2))
+  data.sg.d2.norm[category] = data.norm[category]
+  # 1st and 2nd derivative on raw data 
+  data.d1 = as.data.frame(t(diff(t(data[,-which(names(data)==category)]), differences = 1, lag = 11)))
+  data.d1[category] = data[category]
+  data.d2 = as.data.frame(t(diff(t(data[,-which(names(data)==category)]), differences = 2, lag = 11)))
+  data.d2[category] = data[category]
+  # 1st and 2nd derivative on normalized data 
+  data.d1.norm = as.data.frame(t(diff(t(data.norm[,-which(names(data.norm)==category)]), differences = 1, lag = 11)))
+  data.d1.norm[category] = data.norm[category]
+  data.d2.norm = as.data.frame(t(diff(t(data.norm[,-which(names(data.norm)==category)]), differences = 2, lag = 11)))
+  data.d2.norm[category] = data.norm[category]
+  
+  # prepare for adding noises
+  data.clean = list(data,
+                    data.norm,
+                    data.sg,
+                    data.sg.d1,
+                    data.sg.d2,
+                    data.sg.norm,
+                    data.sg.d1.norm,
+                    data.sg.d2.norm,
+                    data.d1,
+                    data.d2,
+                    data.d1.norm,
+                    data.d2.norm)
+  
+  data.noise10 = lapply(data.clean, function(x){
+    tmp = as.matrix(x[,1:ncol(x)-1])
+    tmp = as.data.frame(jitter(tmp, 10))
+    tmp[category] = x[category]
+    return(tmp)
+  })
+  data.noise50 = lapply(data.clean, function(x){
+    tmp = as.matrix(x[,1:ncol(x)-1])
+    tmp = as.data.frame(jitter(tmp, 50))
+    tmp[category] = x[category]
+    return(tmp)
+  })
+  data.noise100 = lapply(data.clean, function(x){
+    tmp = as.matrix(x[,1:ncol(x)-1])
+    tmp = as.data.frame(jitter(tmp, 100))
+    tmp[category] = x[category]
+    return(tmp)
+  })
+  
+  data.return = list(data.clean,data.noise10,data.noise50,data.noise100)
+  return(data.return)  
+}
+
+
+
+trainTestDataset = function(data,category = "Abbreviation", ntree = 200, metric = "Kappa", clusterNumber = 7, levels = c("clean","noise10","noise50","noise100"),
+                            types = c("raw","norm","sg","sg.d1","sg.d2","sg.norm","sg.norm.d1","sg.norm.d2","raw.d1","raw.d2","norm.d1","norm.d2")){
+  levels = levels
+  types = types
+  variables = data.frame(var = 1:20,imp = 1:20)
+  for (level in 1:length(levels)){
+    levelData = data[[level]]
+    for (type in 1:length(types)){
+      trainingData = levelData[[type]]
+      trCnt = trainCt = trainControl(method = "LOOCV", classProbs = TRUE)
+      trainingData[,category] = as.factor(trainingData[,category])
+      
+      cl = parallel::makeCluster(clusterNumber)
+      doParallel::registerDoParallel(cl)
+      rfModel = train(x = trainingData[,1:ncol(trainingData)-1], y = trainingData[,category], method = "rf", trControl = trCnt, metric = metric, ntree = ntree)
+      parallel::stopCluster(cl)
+      saveRDS(rfModel, file = paste0("models/rfmodel_",levels[level],"_",types[type],".rds"))
+      imp = varImp(rfModel)
+      
+      variables$var = attributes(imp$importance)$row.names[which(imp$importance$Overall %in% sort(imp$importance$Overall, decreasing = T)[1:20])]
+      variables$imp = imp$importance$Overall[which(imp$importance$Overall %in% sort(imp$importance$Overall, decreasing = T)[1:20])]
+      accuracy = rfModel$results[which(rfModel$results$Kappa == max(rfModel$results$Kappa)),]
+      print(paste0("Level: ",levels[level]," Type: ",types[type]))
+      print(accuracy)
+      predictive = rfModel$pred
+      conf = rfModel$finalModel$confusion
+      results = list(variables,accuracy,predictive,conf)
+      saveRDS(results,file = paste0("results/results_",levels[level],"_",types[type],".rds"))
+      
+    }
+  } 
+}
+
+
+
+trainModel = function(data, method = "rf"){
+  if (method == "rf"){
+    cl = parallel::makeCluster(clusterNumber)
+    doParallel::registerDoParallel(cl)
+    mod = train(x = data[,1:ncol(data)-1], y = data[,category], method = "rf", trControl = trCnt, metric = metric, ntree = ntree)
+    parallel::stopCluster(cl)
+    saveRDS(mod, file = paste0("models/rfmodel_",levels[level],"_",types[type],".rds"))
+    imp = varImp(mod)
+  }
+  if (method == "plsr"){
+    trCnt = trainCt = trainControl(method = "cv", classProbs = TRUE, number = 5 ) 
+    cl = parallel::makeCluster(clusterNumber)
+    doParallel::registerDoParallel(cl)
+    mod = train(x = data[,1:ncol(data)-1], y = data[,category], method = "gpls", trControl = trCnt, metric = "Accuracy", ncomp = 60)
+    parallel::stopCluster(cl)
+    saveRDS(mod, file = paste0("models/plsrmodel_",levels[level],"_",types[type],".rds"))
+    imp = varImp(mod) 
+  }
+  if (method == "mlp"){
+    trCnt = trainCt = trainControl(method = "cv", classProbs = TRUE, number = 5 ) 
+    cl = parallel::makeCluster(clusterNumber)
+    doParallel::registerDoParallel(cl)
+    mod = train(x = data[,1:ncol(data)-1], y = data[,category], method = "mlp", trControl = trCnt, metric = "Accuracy", tuneLength = 20)
+    parallel::stopCluster(cl)
+    saveRDS(mod, file = paste0("models/mlpmodel_",levels[level],"_",types[type],".rds"))
+    imp = varImp(mod) 
+  }
+  if (method == "svm"){
+    trCnt = trainCt = trainControl(method = "cv", classProbs = F, number = 5 ) 
+    cl = parallel::makeCluster(clusterNumber)
+    doParallel::registerDoParallel(cl)
+    mod = train(x = data[,1:ncol(data)-1], y = data[,category], method = "lssvmRadial", trControl = trCnt, metric = "Accuracy")
+    parallel::stopCluster(cl)
+    saveRDS(mod, file = paste0("models/svmrmodel_",levels[level],"_",types[type],".rds"))
+    imp = varImp(mod) 
+  }
+}

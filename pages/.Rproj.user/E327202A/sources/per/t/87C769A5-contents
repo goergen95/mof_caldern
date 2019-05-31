@@ -1,0 +1,87 @@
+setwd("B:/polymer/")
+library(Hmisc) #library to calculate p values for correlation
+library(corrplot) #library to visualize correlation
+library(stats) #distance measurments
+library(prospectr) # derivative functions and filter methods for spectra
+library(caret) # machine learing library
+
+abs = read.table("data/10012019_ABS_1.txt", sep = "")
+ps = read.table("data/10012019_PS_1.txt", sep="")
+pa = read.table("data/17122018_PA_1.txt", sep ="")
+pe = read.table("data/18122018_PE_1.txt", sep = "")
+pp = read.table("data/18122018_PP_1.txt", sep ="")
+
+
+
+data = cbind(abs,ps[,2],pa[,2],pe[,2],pp[,2])
+names(data) = c("index","ABS","PS","PA","PE","PP")
+
+# ABS and PS are very similar, the rest looks very differently visually
+plot(data$ABS,type = "l")
+plot(data$PS,type = "l")
+plot(data$PA,type = "l")
+plot(data$PE,type = "l")
+plot(data$PP,type = "l")
+cor(data$ABS,data$PS)
+cor(data$ABS,data$PA)
+
+data.cor = cor(data[,2:6])
+data.rcorr = rcorr(as.matrix(data[,2:6]))
+corrplot(data.corr)
+
+data = t(data)
+# read sample data
+samples = lapply(list.files("data/",pattern = "a1",full.names = T),function(x) {read.table(x,sep = "", col.names = c("index","observation") )})
+samples = do.call(cbind,samples)
+samples = samples[c(1,2,4,6,8,10)]
+samples = t(samples)
+
+# classical distance parameters function
+
+classicalDistance = function(specLib, sample){
+  test = rbind(specLib, sample)
+  lib = dimnames(specLib)[[1]][-1]
+  test.dist = data.frame(euclidean = c(rep(0,length(lib))), 
+                         manhattan = c(rep(0,length(lib))), 
+                         canberra = c(rep(0,length(lib))), 
+                         minkowski = c(rep(0,length(lib))),
+                         pearson = c(rep(0,length(lib))),
+                         pearson.p = c(rep(0,length(lib))),
+                         kendall = c(rep(0,length(lib))),
+                         kendall.p = c(rep(0,length(lib))),
+                         spearman = c(rep(0,length(lib))),
+                         spearman.p = c(rep(0,length(lib))),
+                         row.names = lib)
+  for ( spec in lib){
+    test.dist$euclidean[which(dimnames(test)[[1]] %in% spec == TRUE)-1] = dist(rbind(test[2+length(lib),], test[dimnames(test)[[1]] %in% spec,]), method = "euclidean")[1]
+    test.dist$manhattan[which(dimnames(test)[[1]] %in% spec == TRUE)-1] = dist(rbind(test[2+length(lib),], test[dimnames(test)[[1]] %in% spec,]), method = "manhattan")[1]
+    test.dist$canberra[which(dimnames(test)[[1]] %in% spec == TRUE)-1] = dist(rbind(test[2+length(lib),], test[dimnames(test)[[1]] %in% spec,]), method = "canberra")[1]
+    test.dist$minkowski[which(dimnames(test)[[1]] %in% spec == TRUE)-1] = dist(rbind(test[2+length(lib),], test[dimnames(test)[[1]] %in% spec,]), method = "minkowski")[1]
+    test.dist$pearson[which(dimnames(test)[[1]] %in% spec == TRUE)-1] = cor(test[2+length(lib),],test[dimnames(test)[[1]] %in% spec,], method = "pearson")
+    test.dist$pearson.p[which(dimnames(test)[[1]] %in% spec == TRUE)-1] = cor.test(test[2+length(lib),],test[dimnames(test)[[1]] %in% spec,], method = "pearson")$p.value
+    test.dist$kendall[which(dimnames(test)[[1]] %in% spec == TRUE)-1] = cor(test[2+length(lib),],test[dimnames(test)[[1]] %in% spec,], method = "kendall")
+    test.dist$kendall.p[which(dimnames(test)[[1]] %in% spec == TRUE)-1] = cor.test(test[2+length(lib),],test[dimnames(test)[[1]] %in% spec,], method = "kendall")$p.value
+    test.dist$spearman[which(dimnames(test)[[1]] %in% spec == TRUE)-1] = cor(test[2+length(lib),],test[dimnames(test)[[1]] %in% spec,], method = "spearman")
+    test.dist$spearman.p[which(dimnames(test)[[1]] %in% spec == TRUE)-1] = cor.test(test[2+length(lib),],test[dimnames(test)[[1]] %in% spec,], method = "spearman")$p.value
+  }
+  return(test.dist)
+}
+classicalDistance(data, sample= samples[6,])
+
+
+
+# exclude CO2 bands and some basic preparations
+data = t(data)
+data.co2 = data[-which(data[1,]>1800 & data[1,]<2400),]
+data.sg = savitzkyGolay(data.co2[2:6,], p = 3, w = 11, m = 0)
+data.norm = scale(data.sg)
+data.d1 = t(diff(t(data.norm), differences = 1, lag = 10))
+data.d2 = t(diff(t(data.norm), differences = 2, lag = 10))
+
+data.co2[1:6,2526] = 1:6
+
+train(as.matrix(data.co2[2:6,1:2525]),y = as.factor(data.co2[2:6,2526]), method = "rf")
+
+
+
+

@@ -1,0 +1,437 @@
+setwd("B:/polymer/")
+library(Hmisc) #library to calculate p values for correlation
+library(corrplot) #library to visualize correlation
+library(stats) #distance measurments
+library(prospectr) # derivative functions and filter methods for spectra
+library(caret) # machine learing library
+library(parallel)
+library(doParallel)
+library(rpatrec) # package to add noise
+library(stringr)
+library(hsdar)
+library(ChemoSpec)
+
+data = read.csv("data/ESM/216_2018_1156_MOESM2_ESM.csv", sep = ",", header = T)
+
+
+plastic = data[which(data$Abbreviation %in%  c("PP","PE","PS","PA","HDPE","LDPE","PC","PES","PET","PVC")),]
+plastic = plastic[,c(2:1863,1871)]
+plastic$Abbreviation = make.names(plastic$Abbreviation)
+
+source("polymeRID/createTestDataset.R")
+trainData = createTestDataset(plastic, noise = c(0,10,50,100))
+
+source("polymeRID/trainModells.R")
+
+trCnt = trainCt = trainControl(method = "cv",number = 10, classProbs = TRUE)
+plastic$Abbreviation = as.factor(plastic$Abbreviation)
+
+
+cl = parallel::makeCluster(6)
+doParallel::registerDoParallel(cl)
+mod = train(x = plastic[,1:ncol(plastic)-1], y = plastic$Abbreviation, method = "rf", trControl = trCnt, metric ="Kappa")
+parallel::stopCluster(cl)
+
+
+svmgrid = expand.grid(sigma= c(0.002), C = c(0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9))# sigma 0.002 and C 0.55
+cl = parallel::makeCluster(6)
+doParallel::registerDoParallel(cl)
+mod1 = train(x = plastic[,1:ncol(plastic)-1], y = plastic$Abbreviation, method = "svmRadial", trControl = trCnt, metric ="Kappa", tuneGrid = svmgrid)
+parallel::stopCluster(cl)
+plot(mod1)
+
+cl = parallel::makeCluster(6)
+doParallel::registerDoParallel(cl)
+mod3 = train(x = plastic[,1:ncol(plastic)-1], y = plastic$Abbreviation, method = "rpart", trControl = trCnt, metric ="Kappa")
+parallel::stopCluster(cl)
+
+cl = parallel::makeCluster(6)
+doParallel::registerDoParallel(cl)
+mod4 = train(x = plastic[,1:ncol(plastic)-1], y = plastic$Abbreviation, method = "cforest", trControl = trCnt, metric ="Kappa")
+parallel::stopCluster(cl)
+
+netgrid = expand.grid(decay=c(0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15),
+                      size = c(1,3,5,7,9,11,13))# optimum and size 9 and decay 0.1
+netgrid = expand.grid(size=c(25,30,35,40),decay = c(0.175))# better 0.175 and 15 size
+cl = parallel::makeCluster(6)
+doParallel::registerDoParallel(cl)
+mod8.2 = train(x = plastic[,1:ncol(plastic)-1], y = plastic$Abbreviation, method = "pcaNNet", trControl = trCnt, metric ="Kappa", tuneGrid = netgrid) 
+parallel::stopCluster(cl)
+plot(mod8.2)
+
+
+cl = parallel::makeCluster(6)
+doParallel::registerDoParallel(cl)
+mod9 = train(x = plastic[,1:ncol(plastic)-1], y = plastic$Abbreviation, method = "ORFpls", trControl = trCnt, metric ="Kappa")
+parallel::stopCluster(cl)
+
+
+
+trCnt = trainCt = trainControl(method = "LOOCV", classProbs = TRUE)
+plsgrid = expand.grid(ncomp=c(15,16,17,18,19,20,21,22,23,24,25,26))#optimum at 20
+cl = parallel::makeCluster(6)
+doParallel::registerDoParallel(cl)
+mod10 = train(x = plastic[,1:ncol(plastic)-1], y = plastic$Abbreviation, method = "kernelpls", trControl = trCnt, metric ="Kappa", tuneGrid = plsgrid)
+parallel::stopCluster(cl)
+plot(mod10)
+
+spectral_data = as.matrix(plastic[,2:1864])
+wavelengths = unlist(lapply(as.list(names(plastic[2:1864])),function(x){
+  wl = as.numeric(strsplit(x,"X")[[1]][2])
+  return(wl)
+}))
+info = plastic[,1866:1877]
+polyLib = speclib(spectral_data,wavelengths,SI = info)
+
+plot(polyLib)
+plot(polyLib, FUN = "median")
+plot(polyLib, FUN = "mean")
+
+names(SI(polyLib))
+PP = subset(polyLib, Abbreviation == "PP")
+PE = subset(polyLib, Abbreviation == "PE")
+plot(PP, FUN = "mean", col = "red")
+plot(PE, FUN = "mean", col = "green", new = FALSE)
+
+mask(polyLib) = c(2401.4,2600.0)# actually it should work...
+
+
+
+createTestDataset = function(data,category = "Abbreviation",noise = c(),savG = list(p=3,w=11)){
+  if(!category %in% names(data)) print("The categorial variable you provided does not match any column in the dataframe")
+  # center and scale data
+  data.norm = as.data.frame(base::scale(data[,-which(names(data)==category)]))
+  data.norm[category] = data[category]
+  # savitzkiy golay filter on raw data
+  data.sg = as.data.frame(prospectr::savitzkyGolay(data[,-which(names(data)==category)], p = savG[[1]], w = savG[[2]], m = 0))
+  data.sg[category] = data[category]
+  data.sg.d1 = as.data.frame(prospectr::savitzkyGolay(data[,-which(names(data)==category)], p = savG[[1]], w = savG[[2]], m = 1))
+  data.sg.d1[category] = data[category]
+  data.sg.d2 = as.data.frame(prospectr::savitzkyGolay(data[,-which(names(data)==category)], p = savG[[1]], w = savG[[2]], m = 2))
+  data.sg.d2[category] = data[category]
+  # savitzkiy golay filter on normalized data
+  data.sg.norm = as.data.frame(prospectr::savitzkyGolay(data.norm[,-which(names(data.norm)==category)], p = savG[[1]], w = savG[[2]], m = 0))
+  data.sg.norm[category] = data.norm[category]
+  data.sg.d1.norm = as.data.frame(prospectr::savitzkyGolay(data.norm[,-which(names(data.norm)==category)], p = savG[[1]], w = savG[[2]], m = 1))
+  data.sg.d1.norm[category] = data.norm[category]
+  data.sg.d2.norm = as.data.frame(prospectr::savitzkyGolay(data.norm[,-which(names(data.norm)==category)], p = savG[[1]], w = savG[[2]], m = 2))
+  data.sg.d2.norm[category] = data.norm[category]
+  # 1st and 2nd derivative on raw data 
+  data.d1 = as.data.frame(t(diff(t(data[,-which(names(data)==category)]), differences = 1, lag = 11)))
+  data.d1[category] = data[category]
+  data.d2 = as.data.frame(t(diff(t(data[,-which(names(data)==category)]), differences = 2, lag = 11)))
+  data.d2[category] = data[category]
+  # 1st and 2nd derivative on normalized data 
+  data.d1.norm = as.data.frame(t(diff(t(data.norm[,-which(names(data.norm)==category)]), differences = 1, lag = 11)))
+  data.d1.norm[category] = data.norm[category]
+  data.d2.norm = as.data.frame(t(diff(t(data.norm[,-which(names(data.norm)==category)]), differences = 2, lag = 11)))
+  data.d2.norm[category] = data.norm[category]
+  
+  # prepare for adding noises
+  data.clean = list(data,
+                    data.norm,
+                    data.sg,
+                    data.sg.d1,
+                    data.sg.d2,
+                    data.sg.norm,
+                    data.sg.d1.norm,
+                    data.sg.d2.norm,
+                    data.d1,
+                    data.d2,
+                    data.d1.norm,
+                    data.d2.norm)
+  
+  data.noise10 = lapply(data.clean, function(x){
+    tmp = as.matrix(x[,1:ncol(x)-1])
+    tmp = as.data.frame(jitter(tmp, 10))
+    tmp[category] = x[category]
+    return(tmp)
+  })
+  data.noise50 = lapply(data.clean, function(x){
+    tmp = as.matrix(x[,1:ncol(x)-1])
+    tmp = as.data.frame(jitter(tmp, 50))
+    tmp[category] = x[category]
+    return(tmp)
+  })
+  data.noise100 = lapply(data.clean, function(x){
+    tmp = as.matrix(x[,1:ncol(x)-1])
+    tmp = as.data.frame(jitter(tmp, 100))
+    tmp[category] = x[category]
+    return(tmp)
+  })
+  
+  data.return = list(data.clean,data.noise10,data.noise50,data.noise100)
+  return(data.return)  
+}
+
+predData = createTestDataset(plastic)
+
+trainTestDataset = function(data,category = "Abbreviation",ntree=200, metric = "Kappa", clN = 7, noiseLevels = c("clean","noise10","noise50","noise100"),path=NULL,
+                            preProcTypes = c("raw",
+                                      "norm",
+                                      "sg",
+                                      "d1",
+                                      "d2",
+                                      "sg.d1",
+                                      "sg.d2",
+                                      "sg.norm",
+                                      "d1.norm",
+                                      "d2.norm",
+                                      "sg.d1.norm",
+                                      "sg.d2.norm"),...){
+  #noiseLevels = noiseLevels
+  #preProcTypes = preProcTypes
+  variables = data.frame(var = 1:20,imp = 1:20)
+  for (level in 1:length(noiseLevels)){
+    levelData = data[[level]]
+    for (type in 1:length(preProcTypes)){
+      trainingData = levelData[[type]]
+      trCnt = trainCt = trainControl(method = "LOOCV", classProbs = TRUE)
+      trainingData[,category] = as.factor(trainingData[,category])
+      
+      cl = parallel::makeCluster(clN)
+      doParallel::registerDoParallel(cl)
+      rfModel = train(x = trainingData[,1:ncol(trainingData)-1], y = trainingData[,category], method = "rf", trControl = trCnt, metric = metric, ntree = ntree)
+      parallel::stopCluster(cl)
+      saveRDS(rfModel, file = paste0(path,"rfmodel_",noiseLevels[level],"_",preProcTypes[type],".rds"))
+      imp = varImp(rfModel)
+      
+      variables$var = attributes(imp$importance)$row.names[which(imp$importance$Overall %in% sort(imp$importance$Overall, decreasing = T)[1:20])]
+      variables$imp = imp$importance$Overall[which(imp$importance$Overall %in% sort(imp$importance$Overall, decreasing = T)[1:20])]
+      accuracy = rfModel$results[which(rfModel$results$Kappa == max(rfModel$results$Kappa)),]
+      print(paste0("Level: ",noiseLevels[level]," Type: ",preProcTypes[type]))
+      print(accuracy)
+      predictive = rfModel$pred
+      conf = rfModel$finalModel$confusion
+      results = list(variables,accuracy,predictive,conf)
+      saveRDS(results,file = paste0(path,"results_",noiseLevels[level],"_",preProcTypes[type],".rds"))
+      
+    }
+  } 
+}
+
+trainTestDataset(trainData,noiseLevels = "noise5", path = "run/")
+
+
+rfMod = readRDS("models/rfmodel_clean_norm.d1.rds")
+ls = list.files("models/", full.names = T)
+names = strsplit(ls,"_")
+names = lapply(names, function(x){
+  #tmp = x[2]
+  tmp2 = stringr::str_sub(x[3],0,-5)
+  #tmp = paste0(tmp,"_",tmp2)
+  return(tmp2)
+})
+names=unlist(names)[1:12]
+resultsKappa = data.frame(model = names,raw=rep(0,12),noise10=rep(0,12),noise50=rep(0,12),noise100=rep(0,12))
+for(mod in 1:length(ls)){
+  model = readRDS(ls[mod])
+  kappa = max(model$results$Kappa)
+  print(mod)
+  if(grepl("clean",ls[mod])) resultsKappa$raw[mod] <- kappa
+  if(grepl("noise10_",ls[mod])) resultsKappa$noise10[mod-12] <- kappa
+  if(grepl("noise50",ls[mod])) resultsKappa$noise50[mod-47] <- kappa
+  if(grepl("noise100_",ls[mod])) resultsKappa$noise100[mod-24] <- kappa
+}
+write.csv(resultsKappa,"kappa_test_rf.csv")
+
+
+
+
+
+
+
+trainCt = trainControl(method = "LOOCV", classProbs = TRUE)
+rfModel = train(plastic[,1:1862],plastic$Abbreviation, method = "rf", trControl = trainCt, metric = "Kappa", ntree = 200)
+
+data.sg = savitzkyGolay(plastic[,1:1862], p = 3, w = 11, m = 0)
+data.norm = scale(plastic[,1:1862])
+data.d1 = as.data.frame(t(diff(t(data.norm[,1:1862]), differences = 1, lag = 1)))
+data.d2 = t(diff(t(data.norm), differences = 2, lag = 10))
+data.d1 = as.data.frame(data.d1)
+data.d2 = as.data.frame(data.d2)
+data.d1$Abbreviation = plastic$Abbreviation
+data.d2$Abbreviation = plastic$Abbreviation
+
+rfModeld1 = train(data.d1[,1:1852],data.d1$Abbreviation, method = "rf", trControl = trainCt, metric = "Kappa", ntree = 200)
+rfModeld1
+rfModeld2 = train(data.d1[,1:1842],data.d2$Abbreviation, method = "rf", trControl = trainCt, metric = "Kappa", ntree = 200)
+rfModeld2
+
+checkModel = function(data, method = "rf", number = 5, crossvalidation = "cv", classProbs = TRUE){
+  
+  trControl = trainControl(method = crossvalidation, number = number, classProbs = classProbs)
+  
+  pred = c()
+  obsv = c()
+  variables = list()
+  
+  clean = as.numeric(testing[,1:1862])
+  noise = jitter(clean,factor =100)
+  plot(clean, type = "l")
+  plot(noise, type = "l")
+  
+  
+  for (row in 1:nrow(plastic)){
+    training = plastic[-row,]
+    testing = plastic[row,]
+    fac = list(1,10,20,25,30,35,40,45,50)
+    test = lapply(fac, function(x){
+      noise = jitter(as.numeric(testing[,1:1862]),factor=x)
+    })
+    test = do.call("rbind",test)
+    test = data.frame(test)
+    test$Abbreviation = testing$Abbreviation
+    names(test) = names(training)
+    #noise = noise(as.numeric(testing[,1:1862]), "white", 1)
+    mod = train(training[,1:1862],training$Abbreviation, method = method, trControl = trControl, metric = "Kappa", ntree = 200)
+    predt = predict(mod, test)
+    obsv[row] = as.character(testing$Abbreviation)
+    pred[row] = as.character(predt)
+    print(paste0("Turn number: ",row))
+    print(obsv[row])
+    print(pred[row])
+    imp = varImp(mod)
+    variables[[row]] = attributes(imp$importance)$row.names[which(imp$importance$Overall %in% sort(imp$importance$Overall, decreasing = T)[1:10])]
+  }
+  results = data.frame(do.call("rbind",variables))
+  results$obsv = obsv
+  results$pred = pred
+  return(results)
+  }
+
+
+
+
+
+firstCheck = checkModel(plastic)
+unique(firstCheck$X1)
+
+checkNoise = function(data, method = "rf", number = 5, crossvalidation = "cv", classProbs = TRUE){
+  
+  trControl = trainControl(method = crossvalidation, number = number, classProbs = classProbs)
+  
+  pred = c()
+  obsv = c()
+  variables = list()
+  
+  for (row in 1:nrow(plastic)){
+    training = plastic[-row,]
+    testing = plastic[row,]
+    mod = train(training[,1:1862],training$Abbreviation, method = method, trControl = trControl, metric = "Kappa", ntree = 100)
+    predt = predict(mod, testing)
+    obsv[row] = as.character(testing$Abbreviation)
+    pred[row] = as.character(predt)
+    print(paste0("Turn number: ",row))
+    print(obsv[row])
+    print(pred[row])
+    imp = varImp(mod)
+    variables[[row]] = attributes(imp$importance)$row.names[which(imp$importance$Overall %in% sort(imp$importance$Overall, decreasing = T)[1:10])]
+  }
+  results = data.frame(do.call("rbind",variables))
+  results$obsv = obsv
+  results$pred = pred
+  return(results)
+}
+
+
+
+PP = data[data$Abbreviation == "PP",]
+ABS = data[data$Abbreviation == "ABS",]
+PE = data[data$Abbreviation == "PE",]
+PS = data[data$Abbreviation == "PS",]
+PA = data[data$Abbreviation == "PA",]
+plot(as.matrix(PP)[1,2:1863], type = "l")
+plot(pp, type = "l")
+abs = read.table("data/10012019_ABS_1.txt", sep = "")
+ps = read.table("data/10012019_PS_1.txt", sep="")
+pa = read.table("data/17122018_PA_1.txt", sep ="")
+pe = read.table("data/18122018_PE_1.txt", sep = "")
+pp = read.table("data/18122018_PP_1.txt", sep ="")
+
+
+
+test = read.csv("data/10012019_ABS_1.txt", sep = "")
+test = test[4:2525,]
+test = test[1:2503,]
+
+data.pl = data[data$Plastic.other == "plastic",]
+data.pl$Substance = as.factor(substr(data.pl$Substance,1,5))
+class = make.names(data.pl$Substance)
+
+data.sg = savitzkyGolay(data.pl[,2:1864], p = 3, w = 11, m = 0)
+data.norm = scale(data.sg)
+data.d1 = t(diff(t(data.norm), differences = 1, lag = 10))
+data.d2 = t(diff(t(data.norm), differences = 2, lag = 10))
+
+training = as.data.frame(data.sg)
+training$class = class
+trCont = trainControl(method = "cv", number = 100, p = 0.95,classProbs = T)
+
+cl =  parallel::makeCluster(7)
+doParallel::registerDoParallel(cl)
+rfModel = train(training[,1:1853],training$class, method = "rf",trControl=trCont, metric = "Kappa")
+stopCluster(cl)
+
+
+data.spec = data[,2:1864]
+data.spec$class = make.names(data$Substance)
+data.spec = data.spec[1:325,]
+data.spec = na.omit(data.spec)
+hcl1 = hclust(dist(data.spec[,1:1863]))
+hcl2 = hclust(dist(scale(data.spec[,1:1863])))
+
+par(mfrow = c(1, 2))
+plot(hcl1, main = "original data")
+plot(hcl2, main = "scaled data")
+
+pca <- prcomp(scale(data.spec[,1:1863]))
+summary(pca) # cumulative variance proportion crosses 99% line at PC 61
+biplot(pca)
+var <- pca$sdev^2
+(pve <- var/sum(var))
+cumsum(pve)
+pca$rotation
+eigvalue.pca <- factoextra::get_eigenvalue(pca)
+factoextra::fviz_eig(pca, addlabels = TRUE,ylim=c(0,50))
+var.pca <- factoextra::get_pca_var(pca)
+var.pca
+factoextra::fviz_pca_var(pca, col.var = "black")
+corrplot::corrplot(var.pca$contrib,is.corr = FALSE)
+dim1 = factoextra::fviz_contrib(pca,choice = "var",axes=1)
+dim2 = factoextra::fviz_contrib(pca,choice = "var",axes=2)
+dim3 = factoextra::fviz_contrib(pca,choice = "var",axes=3)
+dim4 = factoextra::fviz_contrib(pca,choice = "var",axes=4)
+dim5 = factoextra::fviz_contrib(pca,choice = "var",axes=5)
+dim6 = factoextra::fviz_contrib(pca,choice = "var",axes=6)
+dim7 = factoextra::fviz_contrib(pca,choice = "var",axes=7)
+dim8 = factoextra::fviz_contrib(pca,choice = "var",axes=8)
+dim9 = factoextra::fviz_contrib(pca,choice = "var",axes=9)
+dim10 = factoextra::fviz_contrib(pca,choice = "var",axes=10)
+dim11 = factoextra::fviz_contrib(pca,choice = "var",axes=11)
+
+
+dim1$data$name[dim1$data$contrib %in% sort(dim1$data$contrib)[1850:1863]]
+dim1$data$contrib[dim1$data$contrib %in% sort(dim1$data$contrib)[1850:1863]]
+dim2$data$name[dim2$data$contrib %in% sort(dim2$data$contrib)[1850:1863]]
+
+
+
+
+
+
+
+head(dim2$data$name)
+head(dim3$data$name)
+head(dim4$data$name)
+head(dim5$data$name)
+head(dim6$data$name)
+head(dim7$data$name)
+head(dim8$data$name)
+head(dim9$data$name)
+head(dim10$data$name)
+head(dim11$data$name)
+head(dim12$data$name)
+head(dim13$data$name)
+head(dim14$data$name)
+head(dim15$data$name)

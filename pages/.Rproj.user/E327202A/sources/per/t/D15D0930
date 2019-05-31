@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1559115209378.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "847543279",
+    "id" : "D15D0930",
+    "lastKnownWriteTime" : 1558611512,
+    "last_content_update" : 1558611512,
+    "path" : "B:/polymer/polymeRID/trainModells.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
